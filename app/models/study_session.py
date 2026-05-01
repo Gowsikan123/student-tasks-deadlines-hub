@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, Text, func
+from sqlalchemy import Date, Integer, String, Text, DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -23,7 +23,13 @@ class StudySession(Base):
     session_date: Mapped[date] = mapped_column(Date, nullable=False)
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,          # Python-side default
+        server_default=func.now(),
+        nullable=False,
+    )
 
     user: Mapped["User"] = relationship("User", back_populates="study_sessions")
     module: Mapped[Optional["Module"]] = relationship("Module", back_populates="study_sessions")
