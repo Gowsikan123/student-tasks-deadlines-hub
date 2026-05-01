@@ -1,52 +1,30 @@
-from __future__ import annotations
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
-from datetime import datetime
-from typing import TYPE_CHECKING
-
-from sqlalchemy import String, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.db.base import Base
-
-if TYPE_CHECKING:
-    from app.models.module import Module
-    from app.models.task import Task
-    from app.models.deadline import Deadline
-    from app.models.study_session import StudySession
-
+from app.db.session import Base
 
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    full_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    full_name = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
+
+    created_at = Column(
         DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
-        nullable=False,
     )
 
-    modules: Mapped[list["Module"]] = relationship(
-        "Module",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    tasks: Mapped[list["Task"]] = relationship(
-        "Task",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    deadlines: Mapped[list["Deadline"]] = relationship(
-        "Deadline",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    study_sessions: Mapped[list["StudySession"]] = relationship(
-        "StudySession",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
+    modules = relationship("Module", back_populates="user", cascade="all, delete-orphan")
+    tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
+    deadlines = relationship("Deadline", back_populates="user", cascade="all, delete-orphan")
+    study_sessions = relationship("StudySession", back_populates="user", cascade="all, delete-orphan")

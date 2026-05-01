@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.dependencies.auth import get_current_user, get_db
@@ -83,7 +83,10 @@ def get_task(
         .first()
     )
     if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
     return task
 
 
@@ -100,7 +103,10 @@ def update_task(
         .first()
     )
     if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
 
     update_data = payload.model_dump(exclude_unset=True)
 
@@ -130,6 +136,108 @@ def update_task(
     return task
 
 
+@router.patch("/{task_id}", response_model=TaskRead)
+def patch_task(
+    task_id: int,
+    payload: TaskUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    task = (
+        db.query(Task)
+        .filter(Task.id == task_id, Task.user_id == current_user.id)
+        .first()
+    )
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields provided for update",
+        )
+
+    if "module_id" in update_data and update_data["module_id"] is not None:
+        module = (
+            db.query(Module)
+            .filter(Module.id == update_data["module_id"], Module.user_id == current_user.id)
+            .first()
+        )
+        if not module:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid module_id for this user",
+            )
+
+    if "status" in update_data:
+        if update_data["status"] == "done" and task.completed_at is None:
+            task.completed_at = datetime.utcnow()
+        elif update_data["status"] != "done":
+            task.completed_at = None
+
+    for field, value in update_data.items():
+        setattr(task, field, value)
+
+    db.commit()
+    db.refresh(task)
+    return task
+
+
+@router.patch("/{task_id}/complete", response_model=TaskRead)
+def complete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    task = (
+        db.query(Task)
+        .filter(Task.id == task_id, Task.user_id == current_user.id)
+        .first()
+    )
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
+
+    task.status = "done"
+    task.completed_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(task)
+    return task
+
+
+@router.patch("/{task_id}/reopen", response_model=TaskRead)
+def reopen_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    task = (
+        db.query(Task)
+        .filter(Task.id == task_id, Task.user_id == current_user.id)
+        .first()
+    )
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
+
+    task.status = "todo"
+    task.completed_at = None
+
+    db.commit()
+    db.refresh(task)
+    return task
+
+
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(
     task_id: int,
@@ -142,8 +250,11 @@ def delete_task(
         .first()
     )
     if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found",
+        )
 
     db.delete(task)
     db.commit()
-    return None
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

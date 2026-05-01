@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Modules{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">Modules</h1>
+  <p class="page-subtitle">Manage the modules for your course or term.</p>
+
+  <div class="nav-links">
+    <a href="/">Dashboard</a>
+    <a href="/tasks-page">Tasks</a>
+  </div>
+
+  <div class="section-box" style="margin-bottom: 1.5rem;">
+    <h2>Add module</h2>
+    <form id="create-module-form" class="auth-form" style="max-width: 420px;">
+      <div class="form-group">
+        <label for="module_name">Name</label>
+        <input
+          type="text"
+          id="module_name"
+          name="module_name"
+          placeholder="e.g. Web Development"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="module_code">Code (optional)</label>
+        <input
+          type="text"
+          id="module_code"
+          name="module_code"
+          placeholder="e.g. CS101"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="module_description">Description (optional)</label>
+        <input
+          type="text"
+          id="module_description"
+          name="module_description"
+          placeholder="Short description"
+        >
+      </div>
+
+      <button type="submit">Add module</button>
+    </form>
+  </div>
+
+  <div class="section-box">
+    <h2>Your modules</h2>
+    <ul class="task-list" id="modules-list">
+      <li>No modules yet.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

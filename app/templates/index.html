@@ -1,8 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1>Student Tasks & Deadlines Hub</h1>
-<p>Project setup is working.</p>
+<div class="container">
+  <h1 class="page-title">Dashboard</h1>
+  <p class="page-subtitle">Welcome back. Your study overview will load below.</p>
+
+  <div class="nav-links">
+    <a href="/">Dashboard</a>
+    <a href="/tasks-page">Tasks</a>
+    <a href="/modules-page">Modules</a>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <h2>To do</h2>
+      <p class="card-number" id="tasks-todo-count">--</p>
+      <p class="card-text">Tasks you have not started yet.</p>
+    </div>
+
+    <div class="card">
+      <h2>In progress</h2>
+      <p class="card-number" id="tasks-in-progress-count">--</p>
+      <p class="card-text">Tasks currently being worked on.</p>
+    </div>
+
+    <div class="card">
+      <h2>Done</h2>
+      <p class="card-number" id="tasks-done-count">--</p>
+      <p class="card-text">Tasks you have completed.</p>
+    </div>
+
+    <div class="card">
+      <h2>Study minutes</h2>
+      <p class="card-number" id="study-minutes-week">--</p>
+      <p class="card-text">Total study time logged this week.</p>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <h2>Upcoming deadlines</h2>
+    <ul class="task-list" id="upcoming-deadlines-list">
+      <li>Loading dashboard data...</li>
+    </ul>
+  </div>
+</div>
 {% endblock %}

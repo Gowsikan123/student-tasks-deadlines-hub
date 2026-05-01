@@ -1,7 +1,44 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - Student Study Planner{% endblock %}
 
 {% block content %}
-<h1>Login</h1>
+<section class="auth-section">
+  <div class="auth-card">
+    <h1>Student Study Planner</h1>
+    <h2>Welcome back</h2>
+    <p>Sign in to manage your modules, tasks, deadlines, and study sessions.</p>
+
+    <form id="login-form" class="auth-form" method="post" action="javascript:void(0);">
+      <div class="form-group">
+        <label for="username">Email</label>
+        <input
+          type="email"
+          id="username"
+          name="username"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+
+      <button type="submit">Log in</button>
+    </form>
+
+    <p class="auth-link">
+      Don’t have an account?
+      <a href="/register-page">Create one</a>
+    </p>
+  </div>
+</section>
 {% endblock %}

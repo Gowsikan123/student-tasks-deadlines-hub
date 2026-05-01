@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.dependencies.auth import get_current_user, get_db
+from app.models.user import User
+from app.models.task import Task
 from app.models.deadline import Deadline
 from app.models.study_session import StudySession
-from app.models.task import Task
-from app.models.user import User
-from app.schemas.dashboard import DashboardSummary, TaskCounts, UpcomingDeadlineItem
+from app.schemas.dashboard import DashboardSummary, UpcomingDeadlineItem, TaskCounts
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -19,60 +18,74 @@ def get_dashboard_summary(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    status_rows = (
-        db.query(Task.status, func.count(Task.id))
-        .filter(Task.user_id == current_user.id)
-        .group_by(Task.status)
-        .all()
+    now = datetime.utcnow()
+    week_ago = now - timedelta(days=7)
+
+    # Task counts
+    todo_count = (
+        db.query(Task)
+        .filter(Task.user_id == current_user.id, Task.status == "todo")
+        .count()
+    )
+    in_progress_count = (
+        db.query(Task)
+        .filter(Task.user_id == current_user.id, Task.status == "in_progress")
+        .count()
+    )
+    done_count = (
+        db.query(Task)
+        .filter(Task.user_id == current_user.id, Task.status == "done")
+        .count()
     )
 
-    counts = {"todo": 0, "in_progress": 0, "done": 0}
-    for status, count in status_rows:
-        if status in counts:
-            counts[status] = count
-
-    now = datetime.utcnow()
-    next_7_days = now + timedelta(days=7)
-
-    upcoming_deadlines = (
+    # Upcoming deadlines in next 7 days
+    upcoming_deadlines_raw = (
         db.query(Deadline)
         .filter(
             Deadline.user_id == current_user.id,
-            Deadline.due_at >= now,
-            Deadline.due_at <= next_7_days,
+            Deadline.due_date >= now,
+            Deadline.due_date <= now + timedelta(days=7),
         )
-        .order_by(Deadline.due_at.asc())
+        .order_by(Deadline.due_date.asc())
+        .limit(5)
         .all()
     )
 
-    today = datetime.utcnow().date()
-    week_start = today - timedelta(days=today.weekday())
+    upcoming_deadlines = [
+        UpcomingDeadlineItem(
+            id=d.id,
+            title=d.title,
+            deadline_type="exam" if d.is_exam else "assignment",
+            due_at=d.due_date,
+            module_id=d.module_id,
+        )
+        for d in upcoming_deadlines_raw
+    ]
 
-    study_minutes_this_week = (
-        db.query(func.coalesce(func.sum(StudySession.duration_minutes), 0))
+    # Study minutes in the last 7 days
+    week_ago_date = week_ago.date()
+    today_date = now.date()
+
+    study_sessions = (
+        db.query(StudySession)
         .filter(
             StudySession.user_id == current_user.id,
-            StudySession.session_date >= week_start,
-            StudySession.session_date <= today,
+            StudySession.session_date >= week_ago_date,
+            StudySession.session_date <= today_date,
         )
-        .scalar()
+        .all()
+    )
+
+    study_minutes_this_week = sum(
+        s.duration_minutes for s in study_sessions
     )
 
     return DashboardSummary(
         task_counts=TaskCounts(
-            todo=counts["todo"],
-            in_progress=counts["in_progress"],
-            done=counts["done"],
+            todo=todo_count,
+            in_progress=in_progress_count,
+            done=done_count,
         ),
-        upcoming_deadlines=[
-            UpcomingDeadlineItem(
-                id=deadline.id,
-                title=deadline.title,
-                deadline_type=deadline.deadline_type,
-                due_at=deadline.due_at,
-                module_id=deadline.module_id,
-            )
-            for deadline in upcoming_deadlines
-        ],
-        study_minutes_this_week=study_minutes_this_week or 0,
+        upcoming_deadlines=upcoming_deadlines,
+        study_minutes_this_week=study_minutes_this_week,
     )

@@ -1,46 +1,27 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
-from app.api.routes.auth import router as auth_router
-from app.api.routes.dashboard import router as dashboard_router
-from app.api.routes.deadlines import router as deadlines_router
-from app.api.routes.modules import router as modules_router
-from app.api.routes.study_sessions import router as study_sessions_router
-from app.api.routes.tasks import router as tasks_router
-from app.db.init_db import init_db
+from app.api.routes import (
+    auth,
+    dashboard,
+    modules,
+    tasks,
+    deadlines,
+    study_sessions,
+    web,
+)
 
-app = FastAPI(title="Student Tasks & Deadlines Hub")
+app = FastAPI(
+    title="Student Study Planner",
+    version="0.1.0",
+)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
 
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
-
-
-app.include_router(auth_router)
-app.include_router(modules_router)
-app.include_router(tasks_router)
-app.include_router(deadlines_router)
-app.include_router(study_sessions_router)
-app.include_router(dashboard_router)
-
-
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    return templates.TemplateResponse(
-        request,
-        "index.html",
-        {
-            "title": "Student Tasks & Deadlines Hub"
-        }
-    )
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+app.include_router(auth.router, tags=["auth"])
+app.include_router(dashboard.router, tags=["dashboard"])
+app.include_router(modules.router, tags=["modules"])
+app.include_router(tasks.router, tags=["tasks"])
+app.include_router(deadlines.router, tags=["deadlines"])
+app.include_router(study_sessions.router, tags=["study-sessions"])
+app.include_router(web.router, tags=["default"])
