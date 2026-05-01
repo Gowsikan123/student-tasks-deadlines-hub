@@ -130,5 +130,4 @@ pytest tests/
 
 ## 👤 Author
 
-**Gowsikan** — T-Level Digital Design Development student  
-[GitHub](https://github.com/Gowsikan123)
+**Gowsikan** — [GitHub](https://github.com/Gowsikan123)
