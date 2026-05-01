@@ -333,3 +333,47 @@ a:hover {
     padding: var(--space-4);
   }
 }
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.task-actions button {
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.task-actions button:hover {
+  background-color: #f3f4f6;
+}
+
+.task-actions .complete-btn {
+  color: #166534;
+}
+
+.task-actions .reopen-btn {
+  color: #92400e;
+}
+
+.task-actions .delete-btn {
+  color: var(--danger);
+}
+
+.task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.task-filters .form-group {
+  min-width: 160px;
+}

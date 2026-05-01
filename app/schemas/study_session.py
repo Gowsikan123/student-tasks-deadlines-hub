@@ -1,29 +1,27 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
-class StudySessionBase(BaseModel):
-    session_date: date
-    duration_minutes: int = Field(ge=1, le=1440)
+class StudySessionCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=255)
     notes: Optional[str] = None
     module_id: Optional[int] = None
+    started_at: datetime
+    ended_at: datetime
 
 
-class StudySessionCreate(StudySessionBase):
-    pass
-
-
-class StudySessionUpdate(BaseModel):
-    session_date: Optional[date] = None
-    duration_minutes: Optional[int] = Field(default=None, ge=1, le=1440)
-    notes: Optional[str] = None
-    module_id: Optional[int] = None
-
-
-class StudySessionRead(StudySessionBase):
+class StudySessionRead(BaseModel):
     id: int
+    title: str
+    notes: Optional[str] = None
+    module_id: Optional[int] = None
+    started_at: datetime
+    ended_at: datetime
+    duration_minutes: int
     created_at: datetime
+    updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True

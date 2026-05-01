@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from app.db.session import engine
+from app.db.base import Base
+
+Base.metadata.create_all(bind=engine)
 
 from app.api.routes import (
     auth,

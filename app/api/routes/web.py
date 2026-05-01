@@ -57,3 +57,19 @@ def modules_page(request: Request):
         name="modules.html",
         context={"request": request},
     )
+
+@router.get("/deadlines-page")
+def deadlines_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="deadlines.html",
+        context={"request": request},
+    )
+
+@router.get("/study-sessions-page")
+def study_sessions_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="study_sessions.html",
+        context={"request": request},
+    )

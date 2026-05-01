@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Deadlines{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">Deadlines</h1>
+  <p class="page-subtitle">Track assignments and exam dates.</p>
+
+  <div class="nav-links">
+    <a href="/">Dashboard</a>
+    <a href="/tasks-page">Tasks</a>
+    <a href="/modules-page">Modules</a>
+    <a href="/deadlines-page">Deadlines</a>
+  </div>
+
+  <div class="section-box" style="margin-bottom: 1.5rem;">
+    <h2>Add deadline</h2>
+
+    <form id="create-deadline-form" class="auth-form" style="max-width: 520px;">
+      <div class="form-group">
+        <label for="deadline_title">Title</label>
+        <input
+          type="text"
+          id="deadline_title"
+          name="deadline_title"
+          placeholder="e.g. Database coursework submission"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="deadline_type">Type</label>
+        <select id="deadline_type" name="deadline_type">
+          <option value="assignment">Assignment</option>
+          <option value="exam">Exam</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="deadline_due_at">Due date and time</label>
+        <input
+          type="datetime-local"
+          id="deadline_due_at"
+          name="deadline_due_at"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="deadline_module_id">Module (optional)</label>
+        <select id="deadline_module_id" name="deadline_module_id">
+          <option value="">No module</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="deadline_notes">Notes (optional)</label>
+        <input
+          type="text"
+          id="deadline_notes"
+          name="deadline_notes"
+          placeholder="Extra details"
+        >
+      </div>
+
+      <button type="submit">Add deadline</button>
+    </form>
+  </div>
+
+  <div class="section-box">
+    <h2>All deadlines</h2>
+    <ul class="task-list" id="deadlines-list">
+      <li>Loading deadlines...</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

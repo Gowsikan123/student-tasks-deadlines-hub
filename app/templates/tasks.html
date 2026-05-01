@@ -11,6 +11,7 @@
     <a href="/">Dashboard</a>
     <a href="/tasks-page">Tasks</a>
     <a href="/modules-page">Modules</a>
+    <a href="/deadlines-page">Deadlines</a>
   </div>
 
   <div class="section-box" style="margin-bottom: 1.5rem;">
@@ -86,6 +87,26 @@
 
   <div class="section-box">
     <h2>All tasks</h2>
+
+    <div class="task-filters">
+      <div class="form-group">
+        <label for="filter_status">Status</label>
+        <select id="filter_status" name="filter_status">
+          <option value="">All</option>
+          <option value="todo">To do</option>
+          <option value="in_progress">In progress</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="filter_module">Module</label>
+        <select id="filter_module" name="filter_module">
+          <option value="">All modules</option>
+        </select>
+      </div>
+    </div>
+
     <ul class="task-list" id="tasks-list">
       <li>Loading tasks...</li>
     </ul>
