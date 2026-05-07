@@ -76,9 +76,3 @@ student-tasks-deadlines-hub/
 - Using Pydantic for input validation and FastAPI's dependency injection for DB sessions
 - Rendering dynamic HTML server-side with Jinja2 template inheritance
 - Modelling relational data with SQLAlchemy and SQLite
-
----
-
-## Author
-
-**Gowsikan** — [GitHub](https://github.com/Gowsikan123)
